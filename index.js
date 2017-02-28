@@ -16,7 +16,7 @@ io.on('connection', function(socket) {
 	
 	var led = [true, false] //định nghĩa một mảng 1 chiều có 2 phần tử: true, false. Mảng này sẽ được gửi đi nhằm thay đổi sự sáng tắt của 2 con đèn LED đỏ và xanh. Dựa vào cài đặt ở Arduino mà đèn LEd sẽ bị bật hoặc tắt. Hãy thử tăng hoạt giảm số lượng biến của mảng led này xem. Và bạn sẽ hiểu điều kỳ diệu của JSON!
 	
-	//Tạo một chu kỳ nhiệm vụ sẽ chạy lại sau mỗi 200ms
+	//Tạo một chu kỳ nhiệm vụ sẽ chạy lại sau mỗi 1000ms
 	var interval1 = setInterval(function() {
 		//đảo trạng thái của mảng led, đảo cho vui để ở Arduino nó nhấp nháy cho vui.
 		for (var i = 0; i < led.length; i++) {
@@ -29,7 +29,28 @@ io.on('connection', function(socket) {
 		}
 		socket.emit('LED', json) //Gửi lệnh LED với các tham số của của chuỗi JSON
 		console.log("send LED")//Ghi ra console.log là đã gửi lệnh LED
-	}, 1000)//1000ms
+	}, 1000)//1000m
+	
+	//tạo một chu kỳ nhiệm vụ sẽ chạy lại sau mỗi 1569ms
+	var interval2 = setInterval(function() {
+		socket.emit("LCD_PRINT", {
+			"line": [
+				new Date(),
+				"KSP dep trai ahihi"
+			]
+		})
+	}, 1569)
+	
+	//tạo một chu kỳ nhiệm vụ sẽ chạy lại sau mỗi 2569ms
+	var i = 0;
+	var interval3 = setInterval(function() {
+		socket.emit("LCD_PRINT", {
+			"line": [
+				"arduino.vn " + (++i).toString(),
+				new Date(),
+			]
+		})
+	}, 2569)
 	
 	
 	//Khi nhận được lệnh LED_STATUS
@@ -46,5 +67,7 @@ io.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		console.log("disconnect") 	//in ra màn hình console cho vui
 		clearInterval(interval1)		//xóa chu kỳ nhiệm vụ đi, chứ không xóa là cái task kia cứ chạy mãi thôi đó!
+		clearInterval(interval2)
+		clearInterval(interval3)			
 	})
 });
