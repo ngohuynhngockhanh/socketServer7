@@ -31,26 +31,23 @@ io.on('connection', function(socket) {
 		console.log("send LED")//Ghi ra console.log là đã gửi lệnh LED
 	}, 1000)//1000m
 	
-	//tạo một chu kỳ nhiệm vụ sẽ chạy lại sau mỗi 1569ms
-	var interval2 = setInterval(function() {
-		socket.emit("LCD_PRINT", {
-			"line": [
-				new Date(),
-				"KSP dep trai ahihi"
-			]
-		})
-	}, 1569)
 	
 	//tạo một chu kỳ nhiệm vụ sẽ chạy lại sau mỗi 2569ms
-	var i = 0;
-	var interval3 = setInterval(function() {
-		socket.emit("LCD_PRINT", {
-			"line": [
-				"arduino.vn " + (++i).toString(),
-				new Date(),
-			]
+	var degree = 0;
+	var k = 1;
+	var interval2 = setInterval(function() {
+		if (degree >= 180)
+			k = -1 
+		if (degree <= 0)
+			k = 1
+		
+		degree += k;
+		//gửi lệnh SERVO với hai tham số đến Arduino
+		socket.emit('SERVO', {
+			'degree': degree,
+			"message":"Degree: " + degree
 		})
-	}, 2569)
+	}, 200)
 	
 	
 	//Khi nhận được lệnh LED_STATUS
@@ -59,15 +56,10 @@ io.on('connection', function(socket) {
 		console.log("recv LED", status)
 	})
 	
-	socket.on('RAIN', function(status) {
-		console.log("recv RAIN", status)
-	})
-	
 	//Khi socket client bị mất kết nối thì chạy hàm sau.
 	socket.on('disconnect', function() {
 		console.log("disconnect") 	//in ra màn hình console cho vui
 		clearInterval(interval1)		//xóa chu kỳ nhiệm vụ đi, chứ không xóa là cái task kia cứ chạy mãi thôi đó!
-		clearInterval(interval2)
-		clearInterval(interval3)			
+		clearInterval(interval2)			
 	})
 });
